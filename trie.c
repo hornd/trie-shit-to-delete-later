@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include "trie.h"
 
-
 extern trie*
 malloc_trie() {
     trie* ret = malloc(sizeof(trie));
@@ -30,7 +29,8 @@ malloc_root_node() {
 
     ret->key = 0;
     ret->num_children = 0;
-    
+    ret->is_valid = FALSE;
+
     for(i=0; i<MAX_CHILD_NODES; i++) {
         ret->children[i] = NULL;
     }
@@ -39,7 +39,7 @@ malloc_root_node() {
 }
 
 static bool
-malloc_child_node(trie_node *root, char key) {
+malloc_child_node(trie_node *root, const char key) {
     trie_node *i = root;
     u8 j;
     
@@ -49,9 +49,11 @@ malloc_child_node(trie_node *root, char key) {
     }
 
     i->num_children++;
+
     i = i->children[TONUMBER(key)];
     i->key = key;
     i->num_children = 0;
+    i->is_valid = FALSE;
     
     for(j=0; j<MAX_CHILD_NODES; j++) {
         i->children[j] = NULL;
@@ -77,7 +79,7 @@ free_nodes(trie_node *root) {
 }
 
 extern bool
-insert_word(trie *val, char *string) {
+insert_word(trie *val, const char *string) {
     u8 i;
     trie_node *cur = val->root;
 
@@ -89,13 +91,14 @@ insert_word(trie *val, char *string) {
        cur = insert_char(cur, string[i]);
        if (!cur) return FALSE;
     }
-    
+
+    cur->is_valid = TRUE;
     return TRUE;
 }
 
 static trie_node*
-insert_char(trie_node *val, char s) {
-    s = TOUPPER(s);
+insert_char(trie_node *val, const char ch) {
+    char s = TOUPPER(ch);
     if (TONUMBER(s) >= (MAX_CHILD_NODES)) {
         return NULL;
     }
@@ -135,27 +138,23 @@ tree_find(trie_node *root, const char *string) {
 }
 
 static void
-dump_trie(trie *tr) {
+dump_trie(const trie *tr) {
     char debug[100] = {0};
     if(tr->root)
         dump_nodes(tr->root, debug, 0);
 }
 
+// Dump all of the words from root to leaf. Skip 
+// the substrings.
 static void
-dump_node_info(trie_node *node, char *recur) {
-    printf("Current node key: %c\n", node->key);
-    printf("Children: %d\n\n", node->num_children);
-}
-
-static void
-dump_nodes(trie_node *node, char recur[], int len) {
+dump_nodes(const trie_node *node, char recur[], int len) {
     u8 i;
     
+    // At the root node, dump the 
     if (!node->num_children) { 
-        //At the leaf, print out the total string.
         recur[len++] = node->key;
         recur[len] = '\0';
-        printf("%s\n", recur);
+        printf("%s  %d\n", recur, node->is_valid);
     }
     else {
         if (node->key != '\0') {

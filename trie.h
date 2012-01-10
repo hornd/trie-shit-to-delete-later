@@ -1,11 +1,9 @@
 #include <stdint.h>
 
 typedef uint8_t u8;
+typedef u8 bool;
 typedef uint32_t u32;
 
-#ifndef bool
-#define bool u8
-#endif
 #ifndef TRUE
 #define TRUE 1
 #endif
@@ -21,6 +19,7 @@ typedef uint32_t u32;
 typedef struct trie_node {
     u8 key;
     int num_children;
+    bool is_valid;
     struct trie_node *children[MAX_CHILD_NODES];
 } trie_node;
 
@@ -38,7 +37,7 @@ static trie_node*
 malloc_root_node();
 
 static bool
-malloc_child_node(trie_node *, char);
+malloc_child_node(trie_node *, const char);
 
 extern void
 free_trie(trie *);
@@ -51,10 +50,10 @@ free_nodes(trie_node *);
 /*************************************/
 
 extern bool
-insert_word(trie *, char *);
+insert_word(trie *, const char *);
 
 static trie_node*
-insert_char(trie_node *, char);
+insert_char(trie_node *, const char);
 
 
 /*************************************/
@@ -73,7 +72,7 @@ tree_find(trie_node *, const char *);
 /*************************************/
 
 static void
-dump_trie(trie *);
+dump_trie(const trie *);
 
 static void
-dump_nodes(trie_node *, char *, int);
+dump_nodes(const trie_node *, char *, int);
