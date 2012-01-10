@@ -1,5 +1,7 @@
-typedef unsigned char u8;
-typedef unsigned int u32;
+#include <stdint.h>
+
+typedef uint8_t u8;
+typedef uint32_t u32;
 
 #ifndef bool
 #define bool u8
@@ -60,7 +62,11 @@ insert_char(trie_node *, char);
 /*************************************/
 
 extern bool
-is_in_tree(char *);
+is_in_tree(trie *, const char *);
+
+static bool
+tree_find(trie_node *, const char *);
+
 
 /*************************************/
 /*              Debug                */

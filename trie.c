@@ -79,7 +79,6 @@ free_nodes(trie_node *root) {
 extern bool
 insert_word(trie *val, char *string) {
     u8 i;
-    bool ret = TRUE;
     trie_node *cur = val->root;
 
     if (!strlen(string)) {
@@ -88,10 +87,10 @@ insert_word(trie *val, char *string) {
 
     for(i=0; i<strlen(string); i++) {
        cur = insert_char(cur, string[i]);
-       if(!ret) break;
+       if (!cur) return FALSE;
     }
     
-    return ret;
+    return TRUE;
 }
 
 static trie_node*
@@ -109,8 +108,30 @@ insert_char(trie_node *val, char s) {
 }
 
 extern bool
-is_in_tree(char *string) {
-    return FALSE;
+is_in_tree(trie *val, const char *string) {
+    if (!val->root) {
+        return FALSE;
+    }
+
+    return tree_find(val->root, string);
+}
+
+static bool
+tree_find(trie_node *root, const char *string) {
+    u8 i;
+    printf("Searching tree for %s\n", string);
+    trie_node *iter = root;
+    for(i=0; i<strlen(string); i++) {
+        char curChar = TOUPPER(string[i]);
+        printf("Current char: %c  ", curChar);
+        if (!iter->children[TONUMBER(curChar)]) {
+            printf("Booooo.\n");
+            return FALSE;
+        }
+        printf("Found key: %c\n", iter->key);
+        iter = iter->children[TONUMBER(curChar)];
+    }
+    return TRUE;
 }
 
 static void
@@ -121,8 +142,7 @@ dump_trie(trie *tr) {
 }
 
 static void
-dump_node_info(trie_node *node, char *recur)
-{
+dump_node_info(trie_node *node, char *recur) {
     printf("Current node key: %c\n", node->key);
     printf("Children: %d\n\n", node->num_children);
 }
@@ -152,14 +172,31 @@ dump_nodes(trie_node *node, char recur[], int len) {
     }
 }
 
-int main(int argc, char** argv[])
+static void 
+debug_assert(char* st, bool should_be_true)
 {
+    if(should_be_true)
+        printf("Passed.\n");
+    else
+        printf("*** FAILED. %s ***", st);
+}
+
+int main(int argc, char** argv[]) {
     trie* a = malloc_trie();
-    insert_word(a, "test");
-    insert_word(a, "tear");
-    insert_word(a, "boo");
-    insert_word(a, "asdf");
-    insert_word(a, "jjjjj");
-    insert_word(a, "aaaaaaaaaaaaaaaaaaaaaaaa");
+    bool ret;
+    ret = insert_word(a, "test");
+    ret = insert_word(a, "tear");
+    ret = insert_word(a, "boo");
+    ret = insert_word(a, "asdf");
+    ret = insert_word(a, "jjjjj");
+    ret = insert_word(a, "aaaaaaaaaaaaaaaaaaaaaaaa");
     dump_trie(a);
+
+
+    debug_assert("test", is_in_tree(a, "test"));
+    debug_assert("tes", is_in_tree(a, "tes"));
+    debug_assert("bod", !is_in_tree(a, "bod"));
+    debug_assert("test", is_in_tree(a, "test"));
+
+    return 0;
 }
