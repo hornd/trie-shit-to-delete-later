@@ -1,9 +1,8 @@
 #include <stdint.h>
 
-typedef uint8_t u8;
-typedef u8 bool;
-typedef uint32_t u32;
-
+#ifndef bool
+#define bool uint8_t
+#endif
 #ifndef TRUE
 #define TRUE 1
 #endif
@@ -17,7 +16,7 @@ typedef uint32_t u32;
 #define TONUMBER(s) ((s) - 0x41)
 
 typedef struct trie_node {
-    u8 key;
+    uint8_t key;
     int num_children;
     bool is_valid;
     struct trie_node *children[MAX_CHILD_NODES];

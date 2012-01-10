@@ -21,7 +21,7 @@ malloc_trie() {
 static trie_node*
 malloc_root_node() {
     trie_node *ret = malloc(sizeof(trie_node));
-    u8 i;
+    uint8_t i;
 
     if (!ret) {
         return NULL;
@@ -41,7 +41,7 @@ malloc_root_node() {
 static bool
 malloc_child_node(trie_node *root, const char key) {
     trie_node *i = root;
-    u8 j;
+    uint8_t j;
     
     i->children[TONUMBER(key)] = malloc(sizeof(trie_node));
     if (!i->children[TONUMBER(key)]) {
@@ -70,7 +70,7 @@ free_trie(trie* val) {
 
 static void
 free_nodes(trie_node *root) {
-    u8 i;
+    uint8_t i;
     for(i=0; i<root->num_children; i++) {
         free_nodes(root->children[i]);
     }
@@ -80,7 +80,7 @@ free_nodes(trie_node *root) {
 
 extern bool
 insert_word(trie *val, const char *string) {
-    u8 i;
+    uint8_t i;
     trie_node *cur = val->root;
 
     if (!strlen(string)) {
@@ -121,7 +121,7 @@ is_in_tree(trie *val, const char *string) {
 
 static bool
 tree_find(trie_node *root, const char *string) {
-    u8 i;
+    uint8_t i;
     printf("Searching tree for %s\n", string);
     trie_node *iter = root;
     for(i=0; i<strlen(string); i++) {
@@ -148,7 +148,7 @@ dump_trie(const trie *tr) {
 // the substrings.
 static void
 dump_nodes(const trie_node *node, char recur[], int len) {
-    u8 i;
+    uint8_t i;
     
     // At the root node, dump the 
     if (!node->num_children) { 
